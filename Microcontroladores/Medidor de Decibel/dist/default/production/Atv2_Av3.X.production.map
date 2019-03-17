@@ -1,0 +1,94 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Thu May 31 21:18:45 2018
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000000
+                   .org_1       code   0x000000    program   0x000002
+                   .org_2       code   0x000004    program   0x00026e
+  .config_2007_ATV2_AV3.O       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000000      
+                            0x000004    0x00013a      
+                            0x002007    0x002007      
+            313 out of 8454 program addresses used, program memory utilization is 3%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+            DISPLAY_CLEAR   0x000065    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+              DISPLAY_OFF   0x000058    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+               DISPLAY_ON   0x00004b    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                DIVIDE_17   0x00000c    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                   ENABLE   0x000044    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+           ESCREVE_FRENTE   0x0000ef    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+   ESCREVE_PRIMEIRA_LINHA   0x000098    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+          ESCREVE_SIMBOLO   0x0000cb    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+             ESCREVE_TRAS   0x0000f4    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+           ESCRITA_FRENTE   0x000101    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                   ESPERE   0x000115    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+              FLUXO_COMUM   0x000014    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+          FLUXO_INVERTIDO   0x000021    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+           INICIALIZA_LCD   0x000072    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                   INICIO   0x00011c    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                  LEITURA   0x000113    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+            LIMPA_ESCRITA   0x0000c6    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+      LOOP_ESCRITA_FRENTE   0x000103    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+        LOOP_ESCRITA_TRAS   0x0000fd    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                     MAIN   0x000139    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+         POSICIONA_CURSOR   0x0000e2    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+         RESOLVE_NEGATIVO   0x0000f9    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                  SAI_INT   0x000007    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+    VERIFICA_MOVIMENTACAO   0x000107    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                    WAIT1   0x000035    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                   WAIT20   0x000040    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                    WAIT5   0x00003a    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                 WAIT_1MS   0x00002e    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                WAIT_20MS   0x00003e    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                 WAIT_5MS   0x000038    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                  SAI_INT   0x000007    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                DIVIDE_17   0x00000c    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+              FLUXO_COMUM   0x000014    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+          FLUXO_INVERTIDO   0x000021    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                 WAIT_1MS   0x00002e    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                    WAIT1   0x000035    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                 WAIT_5MS   0x000038    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                    WAIT5   0x00003a    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                WAIT_20MS   0x00003e    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                   WAIT20   0x000040    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                   ENABLE   0x000044    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+               DISPLAY_ON   0x00004b    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+              DISPLAY_OFF   0x000058    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+            DISPLAY_CLEAR   0x000065    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+           INICIALIZA_LCD   0x000072    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+   ESCREVE_PRIMEIRA_LINHA   0x000098    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+            LIMPA_ESCRITA   0x0000c6    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+          ESCREVE_SIMBOLO   0x0000cb    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+         POSICIONA_CURSOR   0x0000e2    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+           ESCREVE_FRENTE   0x0000ef    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+             ESCREVE_TRAS   0x0000f4    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+         RESOLVE_NEGATIVO   0x0000f9    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+        LOOP_ESCRITA_TRAS   0x0000fd    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+           ESCRITA_FRENTE   0x000101    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+      LOOP_ESCRITA_FRENTE   0x000103    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+    VERIFICA_MOVIMENTACAO   0x000107    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                  LEITURA   0x000113    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                   ESPERE   0x000115    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                   INICIO   0x00011c    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+                     MAIN   0x000139    program     static C:\Users\Gabriel\Dropbox\Microcontroladores\Projetos\AV3\Projeto 2\Atv2_Av3.X\atv2_av3.asm
+
+

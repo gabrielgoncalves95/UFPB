@@ -1,0 +1,1194 @@
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 #INCLUDE <p16F877A.inc> 
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ; Build date : Nov 22 2017
+                      00005 ;  MPASM PIC16F877A processor include
+                      00006 ; 
+                      00007 ;  (c) Copyright 1999-2017 Microchip Technology, All rights reserved
+                      00008 ;==========================================================================
+                      00009 
+                      00567         LIST
+                      00002 
+                      00003 ;CLOCK DE 20MHZ ~ TEMPO POR INSTRUÇÃO DE 200ns  
+                      00004 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00005 ;*                     ARQUIVOS DE DEFINICOES                      *
+                      00006 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00007 ; DEFINICOES
+Warning[205]: Found directive in column 1. (__CONFIG)
+2007   3F32           00008 __CONFIG _BODEN_OFF & _CP_OFF & _PWRTE_ON & _WDT_OFF & _LVP_OFF & _HS_OSC
+                      00009 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00010 ;*                    PAGINACAO DE MEMORIA                         *
+                      00011 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00012 ;DEFINICAO DE COMANDOS DE USUARIO PARA ALTERACAO DA PAGINA DE MEMORIA
+                      00013 ;DEFINICAO DOS BANCOS
+                      00014 #DEFINE     BANK0   BCF STATUS, RP0 ;SETA BANK 0 DE MEMORIA
+                      00015 #DEFINE     BANK1   BSF STATUS, RP0 ;SETA BANK 1 DE MEMORIA
+                      00016         
+                      00017 
+                      00018         
+                      00019         
+                      00020 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00021 ;*                         VARI?VEIS                               *
+                      00022 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00023 ; DEFINICAO DOS NOMES E ENDERECOS DE TODAS AS VARIAVEIS UTILIZADAS 
+                      00024 ; PELO SISTEMA
+                      00025 
+                      00026         CBLOCK  0x20    ;ENDERECO INICIAL DA MEMORIA DE
+                      00027                                         ;USUARIO
+  00000020            00028                 W_TEMP          ;REGISTRADORES TEMPORARIOS PARA USO
+  00000021            00029                 STATUS_TEMP     ;JUNTO AS INTERRUPCOES
+                      00030                 
+                      00031                 
+                      00032                 
+  00000022            00033                 WAIT_COUNT      ;VARIAVEL PARA EXTENDER A ESPERA PARA MAIS DE 1MS
+  00000023            00034                 LETRA           ;SIMBOLO QUE SERA ESCRITO NO DISPLAY
+  00000024            00035                 RESULTADO_ANTERIOR  ;VALOR DO SOM ANTERIOR PRA SABER SE MOVE A BARRA PRA FRENTE OU PRA T
+                            RAS
+                      00036                                 
+  00000025            00037                 VAR             ;VARIAVEL UTILIZADA NA DIVISAO          
+  00000026            00038                 CONTADOR        ;VARIAVEL UTILIZADA NA DIVISAO
+  00000027            00039                 DIRECAO         ;SELECIONA A DIRECAO
+                      00040 
+                      00041 
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00042         ENDC                    ;FIM DO BLOCO DE MEMORIA        
+                      00043         
+                      00044         
+                      00045 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00046 ;*                        FLAGS INTERNOS                           *
+                      00047 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00048 ; DEFINICAO DE TODOS OS FLAGS UTILIZADOS PELO SISTEMA
+                      00049 
+                      00050         
+                      00051 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00052 ;*                         CONSTANTES                              *
+                      00053 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00054 ; DEFINICAO DE TODAS AS CONSTANTES UTILIZADAS PELO SISTEMA
+                      00055 
+                      00056         
+                      00057 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00058 ;*                           ENTRADAS                              *
+                      00059 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00060 ; DEFINICAO DE TODOS OS PINOS QUE SER?O UTILIZADOS COMO ENTRADA
+                      00061 ; RECOMENDAMOS TAMBEM COMENTAR O SIGNIFICADO DE SEUS ESTADOS (0 E 1)
+                      00062 
+                      00063         
+                      00064 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00065 ;*                           SAIDAS                                *
+                      00066 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00067 ; DEFINICAO DE TODOS OS PINOS QUE SERAO UTILIZADOS COMO SAIDA
+                      00068 ; RECOMENDAMOS TAMBEM COMENTAR O SIGNIFICADO DE SEUS ESTADOS (0 E 1)
+                      00069         
+                      00070         
+                      00071 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00072 ;*                       VETOR DE RESET                            *
+                      00073 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00074         
+                      00075         
+0000                  00076         ORG     0x00                    ;ENDERE?O INICIAL DE PROCESSAMENTO
+0000   291C           00077         GOTO    INICIO
+                      00078         
+                      00079 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00080 ;*                    IN?CIO DA INTERRUP??O                        *
+                      00081 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00082 ; ENDERE?O DE DESVIO DAS INTERRUP??ES. A PRIMEIRA TAREFA ? SALVAR OS
+                      00083 ; VALORES DE "W" E "STATUS" PARA RECUPERA??O FUTURA
+                      00084 
+0004                  00085         ORG     0x04                    ;ENDERE?O INICIAL DA INTERRUP??O
+0004   00A0           00086         MOVWF   W_TEMP          ;COPIA W PARA W_TEMP
+0005   0E03           00087         SWAPF   STATUS,W
+0006   00A1           00088         MOVWF   STATUS_TEMP     ;COPIA STATUS PARA STATUS_TEMP
+                      00089 
+                      00090 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00091 ;*                    ROTINA DE INTERRUP??O                        *
+                      00092 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00093 ; AQUI SER? ESCRITA AS ROTINAS DE RECONHECIMENTO E TRATAMENTO DAS
+                      00094 ; INTERRUP??ES
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00095 
+                      00096         
+                      00097         
+                      00098 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00099 ;*                 ROTINA DE SA?DA DA INTERRUP??O                  *
+                      00100 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00101 ; OS VALORES DE "W" E "STATUS" DEVEM SER RECUPERADOS ANTES DE 
+                      00102 ; RETORNAR DA INTERRUP??O
+                      00103 
+0007                  00104 SAI_INT
+0007   0E21           00105         SWAPF   STATUS_TEMP,W
+0008   0083           00106         MOVWF   STATUS          ;MOVE STATUS_TEMP PARA STATUS
+0009   0EA0           00107         SWAPF   W_TEMP,F
+000A   0E20           00108         SWAPF   W_TEMP,W        ;MOVE W_TEMP PARA W
+000B   0009           00109         RETFIE
+                      00110 
+                      00111         
+                      00112 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00113 ;*                       ROTINAS E SUBROTINAS                      *
+                      00114 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00115 ; CADA ROTINA OU SUBROTINA DEVE POSSUIR A DESCRI??O DE FUNCIONAMENTO
+                      00116 ; E UM NOME COERENTE ?S SUAS FUN??ES.
+                      00117 
+000C                  00118 DIVIDE_17       
+Message[305]: Using default destination of 1 (file).
+000C   0AA6           00119         INCF    CONTADOR
+000D   3011           00120         MOVLW   .17
+000E   0225           00121         SUBWF   VAR, W
+000F   00A5           00122         MOVWF   VAR
+0010   1803           00123         BTFSC   STATUS, C
+0011   280C           00124         GOTO    DIVIDE_17
+Message[305]: Using default destination of 1 (file).
+0012   03A6           00125         DECF    CONTADOR
+                      00126         
+0013   0008           00127         RETURN
+                      00128 
+                      00129         
+0014                  00130 FLUXO_COMUM
+0014   1105           00131         BCF     PORTA, 2    ;RS  0
+0015   1109           00132         BCF     PORTE, 2    ;DB7 0 
+0016   1089           00133         BCF     PORTE, 1    ;DB6 0 
+0017   1009           00134         BCF     PORTE, 0    ;DB5 0 
+0018   1285           00135         BCF     PORTA, 5    ;DB4 0 
+0019   2044           00136         CALL    ENABLE
+                      00137         
+001A   1105           00138         BCF     PORTA, 2    ;RS  0
+001B   1109           00139         BCF     PORTE, 2    ;DB3 0 
+001C   1489           00140         BSF     PORTE, 1    ;DB2 1  NO FLUXO ESTÁ 0 MAS NO DATASHEET ESTA 1 
+001D   1409           00141         BSF     PORTE, 0    ;DB1 1  1/D INCREMENTA
+001E   1285           00142         BCF     PORTA, 5    ;DB0 0  S   DISPLAY NAO SHIFTA
+001F   2044           00143         CALL    ENABLE
+                      00144                 
+0020   0008           00145         RETURN
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00146         
+                      00147         
+0021                  00148 FLUXO_INVERTIDO
+                      00149         
+0021   1105           00150         BCF     PORTA, 2    ;RS  0
+0022   1109           00151         BCF     PORTE, 2    ;DB7 0 
+0023   1089           00152         BCF     PORTE, 1    ;DB6 0 
+0024   1009           00153         BCF     PORTE, 0    ;DB5 0 
+0025   1285           00154         BCF     PORTA, 5    ;DB4 0 
+0026   2044           00155         CALL    ENABLE
+                      00156         
+0027   1105           00157         BCF     PORTA, 2    ;RS  0
+0028   1109           00158         BCF     PORTE, 2    ;DB3 0 
+0029   1489           00159         BSF     PORTE, 1    ;DB2 1  NO FLUXO ESTÁ 0 MAS NO DATASHEET ESTA 1 
+002A   1009           00160         BCF     PORTE, 0    ;DB1 1  0 DECREMENTA
+002B   1285           00161         BCF     PORTA, 5    ;DB0 0  S   DISPLAY NAO SHIFTA
+002C   2044           00162         CALL    ENABLE
+                      00163         
+002D   0008           00164         RETURN
+                      00165                 
+                      00166         
+002E                  00167 WAIT_1MS;{
+                      00168         
+002E   1683           00169         BANK1
+002F   3084           00170         MOVLW   B'10000100'         ;PRESCALE DE 1:32 (1.6ms APROX)
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0030   0081           00171         MOVWF   OPTION_REG
+0031   1283           00172         BANK0
+0032   3063           00173         MOVLW   .99                 ;VALOR PARA ESPERAR 1ms
+0033   0081           00174         MOVWF   TMR0
+0034   110B           00175         BCF     INTCON, TMR0IF
+                      00176         
+                      00177         
+0035                  00178 WAIT1
+0035   1D0B           00179         BTFSS   INTCON, TMR0IF      ;ESPERA TIMER ESTOURAR
+0036   2835           00180         GOTO    WAIT1
+                      00181         
+0037   0008           00182         RETURN
+                      00183 ;}
+                      00184         
+0038                  00185 WAIT_5MS
+0038   3005           00186         MOVLW   .5
+0039   00A2           00187         MOVWF   WAIT_COUNT          ;REPETE A ESPERA 5 VEZES
+                      00188                                     ;5ms(APROX)
+003A                  00189 WAIT5
+003A   202E           00190         CALL    WAIT_1MS
+                      00191         
+Message[305]: Using default destination of 1 (file).
+003B   0BA2           00192         DECFSZ  WAIT_COUNT
+003C   283A           00193         GOTO    WAIT5
+                      00194 
+003D   0008           00195         RETURN
+                      00196         
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+003E                  00197 WAIT_20MS
+003E   3014           00198         MOVLW   .20
+003F   00A2           00199         MOVWF   WAIT_COUNT          ;REPETE A ESPERA 20 VEZES
+                      00200                                     ;20ms(APROX)
+                      00201 
+0040                  00202 WAIT20
+0040   202E           00203         CALL    WAIT_1MS
+                      00204         
+Message[305]: Using default destination of 1 (file).
+0041   0BA2           00205         DECFSZ  WAIT_COUNT
+0042   2840           00206         GOTO    WAIT20
+                      00207         
+                      00208         
+0043   0008           00209         RETURN
+                      00210         
+0044                  00211 ENABLE
+                      00212         
+0044   1605           00213         BSF     PORTA, 4        ;SETA ENABLE
+0045   0000           00214         NOP                     ;ESPERA 600ns
+0046   0000           00215         NOP                     ;PARA RESPEITAR O TEMPO EM SET
+0047   0000           00216         NOP
+0048   1205           00217         BCF     PORTA, 4        ;CLEAR ENABLE
+                      00218         
+0049   202E           00219         CALL    WAIT_1MS        ;ESPERA LEITURA COM TEMPO PADRAO ( > 100us )
+                      00220         
+004A   0008           00221         RETURN
+                      00222         
+                      00223         
+004B                  00224 DISPLAY_ON
+                      00225         
+                      00226         ;--------------DISPLAY ON-----------------------------;
+                      00227 
+004B   1105           00228         BCF     PORTA, 2    ;RS  0
+004C   1109           00229         BCF     PORTE, 2    ;DB7 0 
+004D   1089           00230         BCF     PORTE, 1    ;DB6 0 
+004E   1009           00231         BCF     PORTE, 0    ;DB5 0 
+004F   1285           00232         BCF     PORTA, 5    ;DB4 0 
+0050   2044           00233         CALL    ENABLE
+                      00234         
+0051   1105           00235         BCF     PORTA, 2    ;RS  0
+0052   1509           00236         BSF     PORTE, 2    ;DB3 1 
+0053   1489           00237         BSF     PORTE, 1    ;DB2 1 DISPLAY  ON
+0054   1009           00238         BCF     PORTE, 0    ;DB1 1 CURSOR   ON
+0055   1285           00239         BCF     PORTA, 5    ;DB0 1 BRINKING ON
+0056   2044           00240         CALL    ENABLE
+                      00241 
+0057   0008           00242         RETURN
+                      00243 
+                      00244         
+0058                  00245 DISPLAY_OFF
+                      00246         
+                      00247         ;--------------DISPLAY OFF----------------------------;
+                      00248 
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0058   1105           00249         BCF     PORTA, 2    ;RS  0
+0059   1109           00250         BCF     PORTE, 2    ;DB7 0 
+005A   1089           00251         BCF     PORTE, 1    ;DB6 0 
+005B   1009           00252         BCF     PORTE, 0    ;DB5 0 
+005C   1285           00253         BCF     PORTA, 5    ;DB4 0 
+005D   2044           00254         CALL    ENABLE
+                      00255         
+005E   1105           00256         BCF     PORTA, 2    ;RS  0
+005F   1509           00257         BSF     PORTE, 2    ;DB3 1 
+0060   1089           00258         BCF     PORTE, 1    ;DB2 0 DISPLAY  OFF
+0061   1009           00259         BCF     PORTE, 0    ;DB1 0 CURSOR   OFF
+0062   1285           00260         BCF     PORTA, 5    ;DB0 0 BRINKING OFF
+0063   2044           00261         CALL    ENABLE
+                      00262 
+0064   0008           00263         RETURN
+                      00264         
+0065                  00265 DISPLAY_CLEAR
+                      00266         
+                      00267         ;-----------------DISPLAY CLEAR------------------------;
+                      00268         
+0065   1105           00269         BCF     PORTA, 2    ;RS  0
+0066   1109           00270         BCF     PORTE, 2    ;DB7 0 
+0067   1089           00271         BCF     PORTE, 1    ;DB6 0 
+0068   1009           00272         BCF     PORTE, 0    ;DB5 0 
+0069   1285           00273         BCF     PORTA, 5    ;DB4 0 
+006A   2044           00274         CALL    ENABLE
+                      00275         
+006B   1105           00276         BCF     PORTA, 2    ;RS  0
+006C   1109           00277         BCF     PORTE, 2    ;DB3 0 
+006D   1089           00278         BCF     PORTE, 1    ;DB2 0 
+006E   1009           00279         BCF     PORTE, 0    ;DB1 0 
+006F   1685           00280         BSF     PORTA, 5    ;DB0 1 
+0070   2044           00281         CALL    ENABLE
+                      00282 
+0071   0008           00283         RETURN
+                      00284         
+0072                  00285 INICIALIZA_LCD
+                      00286         
+0072   1105           00287         BCF     PORTA, 2    ;SETA SINAL '00011' PARA SER LIDO 3X        
+0073   1109           00288         BCF     PORTE, 2
+0074   1089           00289         BCF     PORTE, 1
+0075   1409           00290         BSF     PORTE, 0
+0076   1685           00291         BSF     PORTA, 5
+                      00292         
+                      00293         ;---------------LIGOU--------------------------------;
+0077   203E           00294         CALL    WAIT_20MS   ;PRIMEIRA ESPERA ( > 15ms )
+                      00295         
+                      00296         
+                      00297         ;---------------LE UMA VEZ---------------------------;
+0078   2044           00298         CALL    ENABLE      ;LE UMA  VEZ
+0079   2038           00299         CALL    WAIT_5MS    ;ESPERA PRIMEIRA LEITURA( > 4.1ms )
+                      00300 
+                      00301         
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00302         ;---------------LE DUAS VEZES------------------------;
+007A   2044           00303         CALL    ENABLE      ;LE DUAS VEZES
+                      00304         
+                      00305         
+                      00306         ;---------------LE TRES VEZES------------------------;
+007B   2044           00307         CALL    ENABLE      ;LE TRES VEZES
+                      00308         
+                      00309         
+                      00310         
+                      00311         ;---------------PRIMEIRO SINAL DE CONFIG-------------;
+007C   1105           00312         BCF     PORTA, 2    ;RS  0
+007D   1109           00313         BCF     PORTE, 2    ;DB7 0
+007E   1089           00314         BCF     PORTE, 1    ;DB6 0
+007F   1409           00315         BSF     PORTE, 0    ;DB5 1
+0080   1285           00316         BCF     PORTA, 5    ;DB4 0
+0081   2044           00317         CALL    ENABLE
+                      00318         
+                      00319         
+                      00320         ;---SEGUNDO SINAL DE GONFIG(4-7 IGUAL AO ANTERIOR)---;
+0082   2044           00321         CALL    ENABLE
+                      00322         
+0083   1105           00323         BCF     PORTA, 2    ;RS  0
+0084   1509           00324         BSF     PORTE, 2    ;DB3 1 N DUAS LINHAS
+0085   1489           00325         BSF     PORTE, 1    ;DB2 1 F 10 PONTOS
+0086   1009           00326         BCF     PORTE, 0    ;DB1 0 * DONT CARE
+0087   1285           00327         BCF     PORTA, 5    ;DB0 0 * DONT CARE
+0088   2044           00328         CALL    ENABLE
+                      00329         
+                      00330         
+                      00331         ;--------------DISPLAY OFF----------------------------;
+0089   2058           00332         CALL    DISPLAY_OFF
+                      00333         
+                      00334         ;-----------------DISPLAY CLEAR------------------------;
+008A   2065           00335         CALL    DISPLAY_CLEAR
+                      00336 
+                      00337         ;-----------------ENTRY MODE SET------------------------;
+                      00338         
+008B   1105           00339         BCF     PORTA, 2    ;RS  0
+008C   1109           00340         BCF     PORTE, 2    ;DB7 0 
+008D   1089           00341         BCF     PORTE, 1    ;DB6 0 
+008E   1009           00342         BCF     PORTE, 0    ;DB5 0 
+008F   1285           00343         BCF     PORTA, 5    ;DB4 0 
+0090   2044           00344         CALL    ENABLE
+                      00345         
+0091   1105           00346         BCF     PORTA, 2    ;RS  0
+0092   1109           00347         BCF     PORTE, 2    ;DB3 0 
+0093   1489           00348         BSF     PORTE, 1    ;DB2 1  NO FLUXO ESTÁ 0 MAS NO DATASHEET ESTA 1 
+0094   1409           00349         BSF     PORTE, 0    ;DB1 1  1/D INCREMENTA
+0095   1285           00350         BCF     PORTA, 5    ;DB0 0  S   DISPLAY NAO SHIFTA
+0096   2044           00351         CALL    ENABLE
+                      00352         
+0097   0008           00353         RETURN
+                      00354 
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00355 
+0098                  00356 ESCREVE_PRIMEIRA_LINHA
+                      00357         
+0098   3064           00358     MOVLW       B'01100100' ;d
+0099   00A3           00359     MOVWF       LETRA
+009A   20CB           00360     CALL        ESCREVE_SIMBOLO
+                      00361 
+009B   3042           00362     MOVLW       B'01000010' ;B
+009C   00A3           00363     MOVWF       LETRA
+009D   20CB           00364     CALL        ESCREVE_SIMBOLO
+                      00365 
+009E   3039           00366     MOVLW       B'00111001' ;9
+009F   00A3           00367     MOVWF       LETRA
+00A0   20CB           00368     CALL        ESCREVE_SIMBOLO
+                      00369 
+00A1   3010           00370     MOVLW       B'00010000' ;espaço
+00A2   00A3           00371     MOVWF       LETRA
+00A3   20CB           00372     CALL        ESCREVE_SIMBOLO
+                      00373 
+00A4   3037           00374     MOVLW       B'00110111' ;7
+00A5   00A3           00375     MOVWF       LETRA
+00A6   20CB           00376     CALL        ESCREVE_SIMBOLO
+                      00377 
+00A7   3010           00378     MOVLW       B'00010000' ;espaço
+00A8   00A3           00379     MOVWF       LETRA
+00A9   20CB           00380     CALL        ESCREVE_SIMBOLO 
+                      00381 
+00AA   3035           00382     MOVLW       B'00110101' ;5
+00AB   00A3           00383     MOVWF       LETRA
+00AC   20CB           00384     CALL        ESCREVE_SIMBOLO 
+                      00385 
+00AD   3010           00386     MOVLW       B'00010000' ;espaço
+00AE   00A3           00387     MOVWF       LETRA
+00AF   20CB           00388     CALL        ESCREVE_SIMBOLO
+                      00389 
+00B0   3033           00390     MOVLW       B'00110011' ;3
+00B1   00A3           00391     MOVWF       LETRA
+00B2   20CB           00392     CALL        ESCREVE_SIMBOLO
+                      00393 
+00B3   3010           00394     MOVLW       B'00010000' ;espaço
+00B4   00A3           00395     MOVWF       LETRA
+00B5   20CB           00396     CALL        ESCREVE_SIMBOLO
+                      00397 
+00B6   3010           00398     MOVLW       B'00010000' ;espaço
+00B7   00A3           00399     MOVWF       LETRA
+00B8   20CB           00400     CALL        ESCREVE_SIMBOLO
+                      00401 
+00B9   3030           00402     MOVLW       B'00110000' ;0
+00BA   00A3           00403     MOVWF       LETRA
+00BB   20CB           00404     CALL        ESCREVE_SIMBOLO
+                      00405 
+00BC   3010           00406     MOVLW       B'00010000' ;espaço
+00BD   00A3           00407     MOVWF       LETRA
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00BE   20CB           00408     CALL        ESCREVE_SIMBOLO
+                      00409 
+00BF   3010           00410     MOVLW       B'00010000' ;espaço
+00C0   00A3           00411     MOVWF       LETRA
+00C1   20CB           00412     CALL        ESCREVE_SIMBOLO 
+                      00413 
+00C2   3033           00414     MOVLW       B'00110011' ;3
+00C3   00A3           00415     MOVWF       LETRA
+00C4   20CB           00416     CALL        ESCREVE_SIMBOLO 
+                      00417     
+00C5   0008           00418     RETURN
+                      00419     
+                      00420         
+00C6                  00421 LIMPA_ESCRITA
+                      00422         
+00C6   1109           00423         BCF     PORTE, 2    ;DB7 0      
+00C7   1089           00424         BCF     PORTE, 1    ;DB6 1      
+00C8   1009           00425         BCF     PORTE, 0    ;DB5 0 
+00C9   1285           00426         BCF     PORTA, 5    ;DB4 1              
+                      00427         
+00CA   0008           00428         RETURN
+                      00429         
+                      00430         
+00CB                  00431 ESCREVE_SIMBOLO
+                      00432         
+00CB   20C6           00433         CALL    LIMPA_ESCRITA
+                      00434         
+00CC   1505           00435         BSF     PORTA, 2    ;RS  1
+                      00436         
+00CD   1BA3           00437         BTFSC   LETRA, 7
+00CE   1509           00438         BSF     PORTE, 2    ;DB7 0 
+                      00439         
+00CF   1B23           00440         BTFSC   LETRA, 6
+00D0   1489           00441         BSF     PORTE, 1    ;DB6 1 
+                      00442         
+00D1   1AA3           00443         BTFSC   LETRA, 5
+00D2   1409           00444         BSF     PORTE, 0    ;DB5 0 
+                      00445 
+00D3   1A23           00446         BTFSC   LETRA, 4
+00D4   1685           00447         BSF     PORTA, 5    ;DB4 1 
+                      00448         
+00D5   2044           00449         CALL    ENABLE
+                      00450         
+00D6   20C6           00451         CALL    LIMPA_ESCRITA
+                      00452         
+00D7   1505           00453         BSF     PORTA, 2    ;RS  1
+                      00454         
+00D8   19A3           00455         BTFSC   LETRA, 3
+00D9   1509           00456         BSF     PORTE, 2    ;DB3 0 
+                      00457         
+00DA   1923           00458         BTFSC   LETRA, 2
+00DB   1489           00459         BSF     PORTE, 1    ;DB2 0 
+                      00460         
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00DC   18A3           00461         BTFSC   LETRA, 1
+00DD   1409           00462         BSF     PORTE, 0    ;DB1 1 
+                      00463 
+00DE   1823           00464         BTFSC   LETRA, 0
+00DF   1685           00465         BSF     PORTA, 5    ;DB0 0 
+                      00466         
+00E0   2044           00467         CALL    ENABLE  
+                      00468         
+00E1   0008           00469         RETURN
+                      00470         
+                      00471 
+00E2                  00472 POSICIONA_CURSOR
+                      00473         
+00E2   1105           00474         BCF     PORTA, 2    ;RS  0
+                      00475         
+00E3   1509           00476         BSF     PORTE, 2    ;DB7 1      
+00E4   1489           00477         BSF     PORTE, 1    ;DB6 0      
+00E5   1009           00478         BCF     PORTE, 0    ;DB5 0 
+00E6   1285           00479         BCF     PORTA, 5    ;DB4 0      
+                      00480         
+00E7   2044           00481         CALL    ENABLE
+                      00482         
+00E8   1105           00483         BCF     PORTA, 2    ;RS  0
+                      00484         
+00E9   1109           00485         BCF     PORTE, 2    ;DB3 0      
+00EA   1089           00486         BCF     PORTE, 1    ;DB2 0      
+00EB   1009           00487         BCF     PORTE, 0    ;DB1 0 
+00EC   1285           00488         BCF     PORTA, 5    ;DB0 0      
+                      00489         
+00ED   2044           00490         CALL    ENABLE
+                      00491         
+00EE   0008           00492         RETURN
+                      00493         
+                      00494         
+00EF                  00495 ESCREVE_FRENTE
+00EF   2014           00496         CALL    FLUXO_COMUM
+00F0   30FF           00497         MOVLW   B'11111111' ;PRETO
+00F1   00A3           00498         MOVWF   LETRA
+00F2   20CB           00499         CALL    ESCREVE_SIMBOLO 
+00F3   0008           00500         RETURN
+                      00501         
+                      00502         
+00F4                  00503 ESCREVE_TRAS
+00F4   2021           00504         CALL    FLUXO_INVERTIDO
+00F5   3010           00505         MOVLW   B'00010000' ;espaço
+00F6   00A3           00506         MOVWF   LETRA
+00F7   20CB           00507         CALL    ESCREVE_SIMBOLO
+00F8   0008           00508         RETURN
+                      00509         
+                      00510 
+00F9                  00511 RESOLVE_NEGATIVO
+00F9   0826           00512         MOVFW   CONTADOR
+00FA   3AFF           00513         XORLW   0XFF
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00FB   00A6           00514         MOVWF   CONTADOR
+00FC   02A4           00515         SUBWF   RESULTADO_ANTERIOR, 1
+                      00516 
+00FD                  00517 LOOP_ESCRITA_TRAS
+00FD   20F4           00518         CALL    ESCREVE_TRAS
+Message[305]: Using default destination of 1 (file).
+00FE   0BA6           00519         DECFSZ  CONTADOR
+00FF   28FD           00520         GOTO    LOOP_ESCRITA_TRAS
+0100   2913           00521         GOTO    LEITURA
+                      00522         
+0101                  00523 ESCRITA_FRENTE
+0101   0826           00524         MOVFW   CONTADOR
+0102   07A4           00525         ADDWF   RESULTADO_ANTERIOR, 1
+0103                  00526 LOOP_ESCRITA_FRENTE
+0103   20EF           00527         CALL    ESCREVE_FRENTE
+Message[305]: Using default destination of 1 (file).
+0104   0BA6           00528         DECFSZ  CONTADOR
+0105   2903           00529         GOTO    LOOP_ESCRITA_FRENTE
+0106   2913           00530         GOTO    LEITURA
+                      00531         
+                      00532         
+0107                  00533 VERIFICA_MOVIMENTACAO
+0107   01A6           00534         CLRF    CONTADOR
+0108   200C           00535         CALL    DIVIDE_17
+0109   0826           00536         MOVFW   CONTADOR
+010A   0224           00537         SUBWF   RESULTADO_ANTERIOR, W
+010B   1C03           00538         BTFSS   STATUS, C
+010C   1427           00539         BSF     DIRECAO, 0
+010D   1903           00540         BTFSC   STATUS, Z
+010E   2913           00541         GOTO    LEITURA
+010F   0826           00542         MOVFW   CONTADOR
+0110   1C27           00543         BTFSS   DIRECAO, 0
+0111   28F9           00544         GOTO    RESOLVE_NEGATIVO
+0112   2901           00545         GOTO    ESCRITA_FRENTE
+                      00546         
+                      00547         
+                      00548         
+0113                  00549 LEITURA
+0113   202E           00550         CALL    WAIT_1MS
+0114   151F           00551         BSF     ADCON0, 2
+                      00552 
+                      00553 ;SOMA LEITURA ANALOGICA EM SOMA_TRINTA E VOLTA PARA LER NOVAMENTE ATE CONTA_TRINTA TER ZERADO
+0115                  00554 ESPERE
+0115   191F           00555         BTFSC   ADCON0, 2
+0116   2915           00556         GOTO    ESPERE
+0117   081E           00557         MOVFW   ADRESH
+0118   30E6           00558         MOVLW   .230
+0119   00A5           00559         MOVWF   VAR
+011A   01A7           00560         CLRF    DIRECAO
+011B   2907           00561         GOTO    VERIFICA_MOVIMENTACAO
+                      00562 
+                      00563 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00564 ;*                     INICIO DO PROGRAMA                          *
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00565 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00566 
+011C                  00567 INICIO
+011C   1683           00568         BANK1
+011D   3000           00569         MOVLW   B'00000000'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+011E   0085           00570         MOVWF   TRISA
+011F   3000           00571         MOVLW   B'00000000'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0120   0086           00572         MOVWF   TRISB
+0121   3000           00573         MOVLW   B'00000000'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0122   0087           00574         MOVWF   TRISC
+0123   3000           00575         MOVLW   B'00000000'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0124   0088           00576         MOVWF   TRISD
+0125   3000           00577         MOVLW   B'00000000'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0126   0089           00578         MOVWF   TRISE
+                      00579         
+                      00580 
+0127   308F           00581         MOVLW   B'10001111'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0128   0081           00582         MOVWF   OPTION_REG
+0129   3000           00583         MOVLW   B'00000000'
+012A   008B           00584         MOVWF   INTCON
+                      00585         
+012B   3004           00586         MOVLW   B'00000100'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+012C   009F           00587         MOVWF   ADCON1
+                      00588 
+012D   3007           00589         MOVLW   B'00000111'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+012E   009C           00590         MOVWF   CMCON
+                      00591 
+012F   1283           00592         BANK0
+                      00593         
+0130   3081           00594         MOVLW   B'10000001'
+0131   009F           00595         MOVWF   ADCON0
+                      00596         
+                      00597         
+                      00598 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00599 ;*                     INICIALIZACAO DAS VARI?VEIS                 *
+                      00600 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00601 
+                      00602 
+Warning[203]: Found opcode in column 1. (CALL)
+0132   2072           00603 CALL    INICIALIZA_LCD
+Warning[203]: Found opcode in column 1. (CALL)
+0133   204B           00604 CALL    DISPLAY_ON
+Warning[203]: Found opcode in column 1. (CALL)
+0134   2098           00605 CALL    ESCREVE_PRIMEIRA_LINHA  
+Warning[203]: Found opcode in column 1. (CALL)
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE 13
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0135   20E2           00606 CALL    POSICIONA_CURSOR    ;POSICIONA O CURSOR NA LINHA 2
+Warning[203]: Found opcode in column 1. (MOVLW)
+0136   30FF           00607 MOVLW   B'11111111' ;PRETO
+Warning[203]: Found opcode in column 1. (MOVWF)
+0137   00A3           00608 MOVWF   LETRA
+Warning[203]: Found opcode in column 1. (CALL)
+0138   20CB           00609 CALL    ESCREVE_SIMBOLO 
+                      00610 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00611 ;*                     ROTINA PRINCIPAL                            *
+                      00612 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00613         
+                      00614 
+                      00615 
+0139                  00616 MAIN
+                      00617         ;CALL   ESCREVE_LINHA1
+0139   2913           00618         GOTO    LEITURA
+                      00619         ;CALL   DIVIDE_17
+                      00620         ;CALL   VERIFICA_MOVIMENTACAO   
+013A   2939           00621         GOTO    MAIN
+                      00622 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00623 ;*                       FIM DO PROGRAMA                           *
+                      00624 ;* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                      00625         
+                      00626     END
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE 14
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ACKDT                             00000005
+ACKEN                             00000004
+ACKSTAT                           00000006
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADCS2                             00000006
+ADDEN                             00000003
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+BANK0                             BCF STATUS, RP0
+BANK1                             BSF STATUS, RP0
+BCLIE                             00000003
+BCLIF                             00000003
+BF                                00000000
+BRGH                              00000002
+C                                 00000000
+C1INV                             00000004
+C1OUT                             00000006
+C2INV                             00000005
+C2OUT                             00000007
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCP2CON                           0000001D
+CCP2IE                            00000000
+CCP2IF                            00000000
+CCP2M0                            00000000
+CCP2M1                            00000001
+CCP2M2                            00000002
+CCP2M3                            00000003
+CCP2X                             00000005
+CCP2Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CCPR2                             0000001B
+CCPR2H                            0000001C
+CCPR2L                            0000001B
+CHS0                              00000003
+CHS1                              00000004
+CHS2                              00000005
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE 15
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+CIS                               00000003
+CKE                               00000006
+CKP                               00000004
+CM0                               00000000
+CM1                               00000001
+CM2                               00000002
+CMCON                             0000009C
+CMIE                              00000006
+CMIF                              00000006
+CONTADOR                          00000026
+CREN                              00000004
+CSRC                              00000007
+CVR0                              00000000
+CVR1                              00000001
+CVR2                              00000002
+CVR3                              00000003
+CVRCON                            0000009D
+CVREN                             00000007
+CVROE                             00000006
+CVRR                              00000005
+D                                 00000005
+DATA_ADDRESS                      00000005
+DC                                00000001
+DIRECAO                           00000027
+DISPLAY_CLEAR                     00000065
+DISPLAY_OFF                       00000058
+DISPLAY_ON                        0000004B
+DIVIDE_17                         0000000C
+D_A                               00000005
+D_NOT_A                           00000005
+EEADR                             0000010D
+EEADRH                            0000010F
+EECON1                            0000018C
+EECON2                            0000018D
+EEDATA                            0000010C
+EEDATH                            0000010E
+EEIE                              00000004
+EEIF                              00000004
+EEPGD                             00000007
+ENABLE                            00000044
+ESCREVE_FRENTE                    000000EF
+ESCREVE_PRIMEIRA_LINHA            00000098
+ESCREVE_SIMBOLO                   000000CB
+ESCREVE_TRAS                      000000F4
+ESCRITA_FRENTE                    00000101
+ESPERE                            00000115
+F                                 00000001
+FERR                              00000002
+FLUXO_COMUM                       00000014
+FLUXO_INVERTIDO                   00000021
+FSR                               00000004
+GCEN                              00000007
+GIE                               00000007
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE 16
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+GO                                00000002
+GO_DONE                           00000002
+GO_NOT_DONE                       00000002
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+I2C_STOP                          00000004
+IBF                               00000007
+IBOV                              00000005
+INDF                              00000000
+INICIALIZA_LCD                    00000072
+INICIO                            0000011C
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+LEITURA                           00000113
+LETRA                             00000023
+LIMPA_ESCRITA                     000000C6
+LOOP_ESCRITA_FRENTE               00000103
+LOOP_ESCRITA_TRAS                 000000FD
+MAIN                              00000139
+NOT_A                             00000005
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000002
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+OBF                               00000006
+OERR                              00000001
+OPTION_REG                        00000081
+P                                 00000004
+PCFG0                             00000000
+PCFG1                             00000001
+PCFG2                             00000002
+PCFG3                             00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PEN                               00000002
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE 17
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+PIR2                              0000000D
+PORTA                             00000005
+PORTB                             00000006
+PORTC                             00000007
+PORTD                             00000008
+PORTE                             00000009
+POSICIONA_CURSOR                  000000E2
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+PSPIE                             00000007
+PSPIF                             00000007
+PSPMODE                           00000004
+R                                 00000002
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RC0                               00000000
+RC1                               00000001
+RC2                               00000002
+RC3                               00000003
+RC4                               00000004
+RC5                               00000005
+RC6                               00000006
+RC7                               00000007
+RC8_9                             00000006
+RC9                               00000006
+RCD8                              00000000
+RCEN                              00000003
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RD0                               00000000
+RD1                               00000001
+RD2                               00000002
+RD3                               00000003
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE 18
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RD4                               00000004
+RD5                               00000005
+RD6                               00000006
+RD7                               00000007
+RE0                               00000000
+RE1                               00000001
+RE2                               00000002
+READ_WRITE                        00000002
+RESOLVE_NEGATIVO                  000000F9
+RESULTADO_ANTERIOR                00000024
+RP0                               00000005
+RP1                               00000006
+RSEN                              00000001
+RX9                               00000006
+RX9D                              00000000
+R_NOT_W                           00000002
+R_W                               00000002
+S                                 00000003
+SAI_INT                           00000007
+SEN                               00000000
+SMP                               00000007
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+SSPCON                            00000014
+SSPCON2                           00000091
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPOV                             00000006
+SSPSTAT                           00000094
+STATUS                            00000003
+STATUS_TEMP                       00000021
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1INSYNC                          00000002
+T1OSCEN                           00000003
+T1SYNC                            00000002
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE 19
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRISC                             00000087
+TRISC0                            00000000
+TRISC1                            00000001
+TRISC2                            00000002
+TRISC3                            00000003
+TRISC4                            00000004
+TRISC5                            00000005
+TRISC6                            00000006
+TRISC7                            00000007
+TRISD                             00000088
+TRISD0                            00000000
+TRISD1                            00000001
+TRISD2                            00000002
+TRISD3                            00000003
+TRISD4                            00000004
+TRISD5                            00000005
+TRISD6                            00000006
+TRISD7                            00000007
+TRISE                             00000089
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE 20
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TRISE0                            00000000
+TRISE1                            00000001
+TRISE2                            00000002
+TRMT                              00000001
+TX8_9                             00000006
+TX9                               00000006
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UA                                00000001
+VAR                               00000025
+VERIFICA_MOVIMENTACAO             00000107
+W                                 00000000
+WAIT1                             00000035
+WAIT20                            00000040
+WAIT5                             0000003A
+WAIT_1MS                          0000002E
+WAIT_20MS                         0000003E
+WAIT_5MS                          00000038
+WAIT_COUNT                        00000022
+WCOL                              00000007
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+W_TEMP                            00000020
+Z                                 00000002
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_ALL                           00001FFF
+_CP_OFF                           00003FFF
+_CP_ON                            00001FFF
+_DEBUG_OFF                        00003FFF
+_DEBUG_ON                         000037FF
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_LP_OSC                           00003FFC
+MPASM 5.77                      ATV2_AV3.ASM   5-31-2018  21:18:43         PAGE 21
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_WRT_1FOURTH                      00003BFF
+_WRT_256                          00003DFF
+_WRT_HALF                         000039FF
+_WRT_OFF                          00003FFF
+_XT_OSC                           00003FFD
+__16F877A                         00000001
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+0000 : X---XXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0040 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0080 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+00C0 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0100 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXX-----
+2000 : -------X-------- ---------------- ---------------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:   312
+Program Memory Words Free:  7880
+
+
+Errors   :     0
+Warnings :     8 reported,     0 suppressed
+Messages :    15 reported,     0 suppressed
+
+

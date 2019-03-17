@@ -1,0 +1,20 @@
+# depslib dependency file v1.0
+1529751587 source:c:\workspace_cpp\maximacobertura\main.cpp
+	<iostream>
+	<fstream>
+	<vector>
+	<map>
+	<math.h>
+	<climits>
+	<cstdlib>
+	<time.h>
+	"include/Conjunto.h"
+
+1528652810 source:c:\workspace_cpp\maximacobertura\src\conjunto.cpp
+	"Conjunto.h"
+
+1528848932 c:\workspace_cpp\maximacobertura\include\conjunto.h
+
+1528848345 source:c:\workspace_cpp\maximacobertura\conjunto.cpp
+	"include/Conjunto.h"
+
